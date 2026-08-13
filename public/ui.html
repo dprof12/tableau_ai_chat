@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Data Chatbot</title>
+  
+  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Tableau Extensions JS SDK -->
+  <script src="js/tableau.extensions.1.latest.js"></script>
+  
+  <!-- Marked.js for rendering markdown output -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+  <div class="chat-app-container" id="appContainer">
+    
+    <!-- Header -->
+    <header class="chat-header">
+      <div class="header-title-section">
+        <span class="status-indicator online"></span>
+        <h3 class="chat-title">Po'tata</h3>
+      </div>
+      <button id="clearChatBtn" class="action-btn-icon" title="Bersihkan Percakapan">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2M10 11v6M14 11v6"/>
+        </svg>
+      </button>
+    </header>
+
+    <!-- Chat Area -->
+    <main class="chat-body" id="chatBody">
+      <div class="chat-scroll-wrapper" id="chatScrollWrapper">
+        <div class="chat-messages-container" id="chatMessages">
+          
+          <!-- System Welcome Message -->
+          <div class="chat-message bot-message">
+            <div class="message-content">
+              <p>Halo! Saya adalah <strong>Po'tata</strong> khusus untuk dashboard ini. Tanyakan apa saja mengenai data yang ada pada dashboard ini, saya akan membantu menganalisisnya.</p>
+            </div>
+            <span class="message-time">Sistem</span>
+          </div>
+
+        </div>
+
+        <!-- Bouncy Typing Indicator -->
+        <div id="typingIndicator" class="chat-message bot-message hidden">
+          <div class="message-content typing-content">
+            <div class="typing-bubble">
+              <span class="typing-dot"></span>
+              <span class="typing-dot"></span>
+              <span class="typing-dot"></span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- Suggestions Panel -->
+    <section class="suggestions-panel" id="suggestionsPanel">
+      <div class="suggestions-wrapper" id="suggestionsWrapper">
+        <button class="suggest-chip" data-query="Tolong ringkas seluruh data dashboard ini">📝 Ringkas Data</button>
+      </div>
+    </section>
+
+    <!-- Input Footer -->
+    <footer class="chat-footer">
+      <form id="chatForm" class="chat-input-form">
+        <input type="text" id="chatInput" autocomplete="off" placeholder="Tanyakan data dashboard di sini..." maxlength="500">
+        <button type="submit" id="sendBtn" class="send-btn" title="Kirim">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </form>
+    </footer>
+
+  </div>
+
+  <!-- Main Logic -->
+  <script src="js/app.js"></script>
+</body>
+</html>
