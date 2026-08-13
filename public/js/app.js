@@ -167,70 +167,38 @@ async function extractDashboardData() {
   }
 
   const combinedSheetsData = [];
-  const processedSources = new Set();
 
-  // Attempt to query Underlying logical tables directly from Datasources
+  // Ambil summary data dari semua worksheet aktif di dashboard
   for (const ws of worksheets) {
     try {
-      const datasources = await ws.getDataSourcesAsync();
-      for (const ds of datasources) {
-        if (processedSources.has(ds.name)) continue;
-        processedSources.add(ds.name);
-
-        const logicalTables = await ds.getLogicalTablesAsync();
-        for (const lt of logicalTables) {
-          try {
-            // Retrieve underlying logical table data (unfiltered)
-            const dataTable = await ds.getLogicalTableDataAsync(lt.id);
-            
-            const columns = dataTable.columns.map(c => c.fieldName);
-            const rows = dataTable.data.map(row => {
-              return row.map(cell => (cell.formattedValue !== undefined && cell.formattedValue !== null) ? cell.formattedValue : cell.value);
-            });
-
-            combinedSheetsData.push({
-              worksheetName: `${ds.name} - ${lt.caption || lt.id}`,
-              columns: columns,
-              rows: rows
-            });
-          } catch (tableErr) {
-            console.warn(`Gagal membaca data dari tabel logis ${lt.id} di datasource ${ds.name}:`, tableErr);
-          }
-        }
-      }
-    } catch (dsErr) {
-      console.warn(`Gagal membaca datasource dari worksheet ${ws.name}:`, dsErr);
-    }
-  }
-
-  // Fallback: If no datasource logical tables could be loaded, read summary data from worksheets instead
-  if (combinedSheetsData.length === 0) {
-    console.log('Fallback ke summary data worksheets...');
-    for (const ws of worksheets) {
-      try {
-        const summaryData = await ws.getSummaryDataAsync({ maxRows: 100 });
-        const columns = summaryData.columns.map(c => c.fieldName);
-        const rows = summaryData.data.map(row => {
-          return row.map(cell => (cell.formattedValue !== undefined && cell.formattedValue !== null) ? cell.formattedValue : cell.value);
-        });
-        
-        combinedSheetsData.push({
-          worksheetName: ws.name,
-          columns: columns,
-          rows: rows
-        });
-      } catch (sumErr) {
-        console.warn(`Gagal membaca summary data dari worksheet ${ws.name}:`, sumErr);
-      }
+      const summaryData = await ws.getSummaryDataAsync({ maxRows: 100 });
+      const columns = summaryData.columns.map(c => c.fieldName);
+      const rows = summaryData.data.map(row => {
+        return row.map(cell => (cell.formattedValue !== undefined && cell.formattedValue !== null) ? cell.formattedValue : cell.value);
+      });
+      
+      combinedSheetsData.push({
+        worksheetName: ws.name,
+        columns: columns,
+        rows: rows
+      });
+    } catch (sumErr) {
+      console.warn(`Gagal membaca summary data dari worksheet ${ws.name}:`, sumErr);
     }
   }
 
   if (combinedSheetsData.length === 0) {
-    throw new Error('Gagal mengambil data dari dashboard Tableau. Pastikan extension memiliki izin full data.');
+    throw new Error('Gagal mengambil data dari dashboard Tableau. Pastikan extension memiliki izin membaca data.');
+  }
+
+  let dashboardName = state.dashboard.name || 'Dashboard Tableau';
+  // Jika nama dashboard adalah kode angka (seperti 12.1.1.1), ganti dengan judul deskriptif
+  if (/^\d+(\.\d+)+/.test(dashboardName)) {
+    dashboardName = 'Jumlah Penumpang Angkutan Umum yang Terlayani';
   }
 
   return {
-    dashboardName: state.dashboard.name || 'Dashboard Tableau',
+    dashboardName: dashboardName,
     sheetsData: combinedSheetsData
   };
 }
