@@ -45,12 +45,23 @@ export default async function handler(req, res) {
 
     // 2. Read Environment Variables
     const provider = (process.env.AI_PROVIDER || 'gemini').toLowerCase().trim();
-    const apiKey = process.env.AI_API_KEY || process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY;
+    
+    // Ambil API Key berdasarkan provider secara spesifik untuk menghindari bentrokan key di Vercel
+    let apiKey = process.env.AI_API_KEY;
+    if (!apiKey) {
+      if (provider === 'openrouter') {
+        apiKey = process.env.OPENROUTER_API_KEY;
+      } else if (provider === 'openai') {
+        apiKey = process.env.OPENAI_API_KEY;
+      } else {
+        apiKey = process.env.GEMINI_API_KEY;
+      }
+    }
 
     if (!apiKey) {
       return res.status(500).json({
         success: false,
-        error: 'AI_API_KEY belum dikonfigurasi di Environment Variables Vercel.'
+        error: `API Key untuk provider '${provider}' belum dikonfigurasi di Environment Variables Vercel.`
       });
     }
 
