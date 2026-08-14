@@ -87,8 +87,35 @@ ${formattedDataText}`;
 
     let replyText = '';
 
-    // 5. Invoke LLM (Gemini or OpenAI)
-    if (provider === 'openai') {
+    // 5. Invoke LLM (Gemini, OpenAI, or OpenRouter)
+    if (provider === 'openrouter') {
+      const modelName = process.env.AI_MODEL || 'deepseek/deepseek-v4-flash-0731';
+      const openai = new OpenAI({
+        apiKey: apiKey,
+        baseURL: 'https://openrouter.ai/api/v1',
+        defaultHeaders: {
+          'HTTP-Referer': 'https://tableau-ai-chat.vercel.app',
+          'X-Title': 'Po\'tata AI Chat'
+        }
+      });
+
+      const messages = [
+        { role: 'system', content: systemPrompt },
+        ...chatHistory.map(h => ({
+          role: h && h.role === 'model' ? 'assistant' : 'user',
+          content: (h && h.content) || ''
+        })),
+        { role: 'user', content: message }
+      ];
+
+      const completion = await openai.chat.completions.create({
+        model: modelName,
+        messages: messages,
+        temperature: 0.3
+      });
+
+      replyText = completion.choices[0]?.message?.content || '';
+    } else if (provider === 'openai') {
       const modelName = process.env.AI_MODEL || 'gpt-4o-mini';
       const openai = new OpenAI({ apiKey });
 
